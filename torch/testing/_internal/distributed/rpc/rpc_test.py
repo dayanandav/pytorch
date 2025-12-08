@@ -6491,9 +6491,6 @@ class TensorPipeAgentDeviceRpcTest(RpcAgentTestFixture, RpcTestCommon):
         future.wait()
 
     @skip_if_lt_x_gpu(1)
-    @skipIfXpu(
-        msg="XPU event serialization is not supported"
-    )
     def test_rref_with_unpickleable_attributes(self):
         dst = worker_name((self.rank + 1) % self.world_size)
         options = self.rpc_backend_options
