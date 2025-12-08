@@ -468,14 +468,10 @@ c10::intrusive_ptr<c10::ivalue::Future> DistEngine::executeSendFunctionAsync(
   const auto& send_backward_stream = sendFunction->stream();
   if (send_backward_stream) {
     for (const auto& grad : sendFunction->getGrads()) {
-      auto device_type = c10::DeviceType::CUDA;
-      if (grad.device().type() == c10::DeviceType::XPU) {
-        device_type = c10::DeviceType::XPU;
-      }
-      const auto guard = c10::impl::VirtualGuardImpl{device_type};
+      const auto guard = c10::impl::VirtualGuardImpl{grad.device().type()};
       const auto default_stream = guard.getStream(grad.device());
       if (send_backward_stream != default_stream) {
-        auto event = c10::Event{device_type};
+        auto event = c10::Event{grad.device().type()};
         event.record(default_stream);
         send_backward_stream->wait(event);
       }
